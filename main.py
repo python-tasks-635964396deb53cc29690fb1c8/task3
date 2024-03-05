@@ -34,23 +34,29 @@ class Figure2D:
         raise RuntimeError()
 
     def is_intersect(self, figure) -> bool:
+        intersects = []
         p_a: list[Point] = self.points
         p_b: list[Point] = figure.points
+
         for i in range(len(p_a)):
             for j in range(len(p_b)):
                 p11 = p_a[i-1]
                 p12 = p_a[i]
                 p21 = p_b[j-1]
                 p22 = p_b[j]
-                m1 = (p12.y - p11.y) / (p12.x - p11.x)
-                m2 = (p22.y - p21.y) / (p22.x - p21.x)
-                c1 = p11.y - m1 * p11.x
-                c2 = p21.y - m2 * p21.x
+                try:
+                    # угл. коэф
+                    m1 = (p12.y - p11.y) / (p12.x - p11.x)
+                    m2 = (p22.y - p21.y) / (p22.x - p21.x)
+                except ArithmeticError:
+                    continue
 
-                if m1 == m2 and c1 != c2:
-                    return True
+                if m1 == m2:
+                    intersects.append(True)
                 else:
-                    return False
+                    intersects.append(False)
+
+        return any(intersects)
 
     def compare(self, figure) -> int:
         a1 = self.area()
@@ -86,3 +92,8 @@ class Triangle(Figure2D):
         for v in map(lambda side: p - side, sides):
             area *= v
         return (p * area)**0.5
+
+
+f1: Figure2D = Triangle([Point(0, 0), Point(3, 5), Point(5, 0)])
+f2: Figure2D = Triangle([Point(0, 0), Point(0, 10), Point(10, 0)])
+print(f1.is_intersect(f2))
